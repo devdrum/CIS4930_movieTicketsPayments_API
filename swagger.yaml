@@ -31,7 +31,6 @@ paths:
         - Payments
       summary: Retrieves invoice/payment information by Invoice ID
       description: Use a pending invoice ID from the reservations API to retrieve invoice, including payment due.
-      operationId: findInvoiceByID
       parameters:
         - name: invoiceID
           in: path
