@@ -30,7 +30,7 @@ paths:
       tags:
         - Payments
       summary: Retrieves invoice/payment information by Invoice ID
-      description: Use a pending invoice ID from the reservations API to retrieve payment information
+      description: Use a pending invoice ID from the reservations API to retrieve invoice, including payment due.
       operationId: findInvoiceByID
       parameters:
         - name: invoiceID
@@ -129,9 +129,8 @@ components:
           format: currency
           example: 25.87
         movieName:
-          type: integer
-          format: int32
-          example: 7
+          type: string
+          example: "Die Hard 2"
         Date/Time:
           type: string
           format: date-time
