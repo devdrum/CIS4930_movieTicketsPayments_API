@@ -1,0 +1,170 @@
+openapi: 3.0.3
+info:
+  title: Purchase Movie Tickets - OpenAPI 3.0
+  description: |-
+    This is a movie ticket payment system based on the OpenAPI 3.0 specification. 
+    Through this payment API you can fetch a pending invoice, attempt a user payment, 
+    and cancel an existing reservation.
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: payments_support@ABCMOvies.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: https://dev.ABCMovies.com/api/payments
+    description: "Payments API Gateway"
+tags:
+  - name: Payments
+    description: Everything about your Pets
+    externalDocs:
+      description: Find out more
+      url: http://swagger.io
+paths:
+  /invoice/{invoiceID}:
+    get:
+      tags:
+        - Payments
+      summary: Retrieves invoice/payment information by Invoice ID
+      description: Use a pending invoice ID from the reservations API to retrieve payment information
+      operationId: findInvoiceByID
+      parameters:
+        - name: invoiceID
+          in: path
+          description: "ID of the pending invoice to retrieve"
+          required: true
+          schema:
+            type: integer
+            format: int64
+
+      responses:
+        '200':
+          description: successful operation, returns Invoice object for payment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'          
+
+        '404':
+          description: "INVOICE ID NOT FOUND: Invalid invoiceID in request"
+
+  /delete_invoice/{invoiceID}:
+    delete:
+      tags:
+        - Payments
+      summary: Cancels an existing reservation
+      description: Cancel an existing reservation using the invoiceID. This will return either success, failure due to invalid invoiceID, or failure due to cancellation outside of the cancellation period (returning the deadline for cancellation).
+      parameters:
+        - name: invoiceID
+          in: path
+          description: "ID of the invoice to cancel"
+          required: true
+          schema:
+            type: integer
+            format: int64
+
+      responses:
+        '200':
+          description: successful operation, reservation has been cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+        '404':
+          description: "INVOICE ID NOT FOUND: Invalid invoiceID in request"
+        '403':
+          description: "FORBIDDEN: The provided invoice is either not completed, or is not within the timeframe where cancellation is allowed"
+
+  /makePayment/{invoiceID}:
+    post:
+      tags:
+        - Payments
+      summary: Attempts payment on a pending invoice
+      description: Attempts to make a payment on a pending invoice. Possible responses include success, failure due to unauthorized payment, or failure due to invalid request.
+      parameters:
+        - name: invoiceID
+          in: path
+          description: ID of pet to update
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Payment'
+      responses:
+        '200':
+          description: "Payment was successful"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  confirmationID:
+                    type: string
+                    example: 6sf51b65s1b65sf1
+        '404':
+          description: "INVOICE ID NOT FOUND: Invalid invoiceID in request"
+        '402':
+          description: "Payment was unable to be authorized by payment system (request valid, but processor could not successfully process payment)"
+
+  
+components:
+  schemas:
+    Invoice:
+      type: object
+      properties:
+        invoiceID:
+          type: integer
+          format: int64
+          example: 10
+        price:
+          type: number
+          format: currency
+          example: 25.87
+        movieName:
+          type: integer
+          format: int32
+          example: 7
+        Date/Time:
+          type: string
+          format: date-time
+        seatNumber:
+          type: string
+          description: Seat Number
+          example: 256A
+        status:
+          type: string
+          example: pending
+    Payment:
+      type: object
+      properties:
+        invoiceID:
+          type: integer
+          format: int64
+          example: 10
+        cardNumber:
+          type: number
+          format: credit card number
+          example: 5555444433332222
+        cardExpirationDate:
+          type: string
+          format: MMYY
+          example: 0229
+        cardCVV:
+          type: integer
+          format: int64
+          example: 778
+  requestBodies:
+    Payment:
+      description: Payment information for making a payment
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Payment'
