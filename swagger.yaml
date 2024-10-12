@@ -154,7 +154,7 @@ components:
         cardExpirationDate:
           type: string
           format: MMYY
-          example: 0229
+          example: "0229"
         cardCVV:
           type: integer
           format: int64
