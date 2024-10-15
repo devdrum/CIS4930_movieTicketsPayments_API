@@ -20,7 +20,6 @@ servers:
     description: "Payments API Gateway"
 tags:
   - name: Payments
-    description: Everything about your Pets
     externalDocs:
       description: Find out more
       url: http://swagger.io
@@ -87,7 +86,6 @@ paths:
       parameters:
         - name: invoiceID
           in: path
-          description: ID of pet to update
           required: true
           schema:
             type: integer
